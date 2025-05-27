@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "minecraft-overlay-client",
+  "version": "${version}",
+  "name": "Minecraft Overlay Client",
+  "description": "Client-side mod for streaming overlay data collection",
+  "authors": [
+    "YaUhYeah"
+  ],
+  "contact": {
+    "homepage": "https://github.com/yauhyeah/minecraft-overlay",
+    "sources": "https://github.com/yauhyeah/minecraft-overlay"
+  },
+  "license": "MIT",
+  "icon": "assets/minecraft-overlay-client/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.yauhyeah.overlaymod.MinecraftOverlayClient"
+    ]
+  },
+  "mixins": [
+    "minecraft-overlay-client.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

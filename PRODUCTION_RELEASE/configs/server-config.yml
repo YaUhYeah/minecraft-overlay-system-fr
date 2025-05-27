@@ -1,0 +1,39 @@
+# Minecraft Overlay Plugin Configuration
+overlay:
+  # URL where the overlay server is running
+  server-url: "http://localhost:3002/api/server-data"
+  
+  # How often to send data (in milliseconds)
+  update-interval: 1000
+  
+  # Enable/disable the plugin
+  enabled: true
+  
+  # Debug mode for troubleshooting
+  debug: false
+
+# Custom placeholders configuration
+placeholders:
+  # Enable custom placeholder support
+  enabled: true
+  
+  # Custom placeholders to track
+  custom-placeholders:
+    - "%server_custom_data%"
+    - "%player_custom_stat%"
+    - "%economy_balance%"
+    - "%faction_power%"
+  
+  # Placeholder update interval (milliseconds)
+  update-interval: 5000
+
+# Performance settings
+performance:
+  # Maximum number of players to track simultaneously
+  max-tracked-players: 100
+  
+  # Data compression for network transfer
+  compress-data: true
+  
+  # Cache duration for expensive operations (seconds)
+  cache-duration: 30

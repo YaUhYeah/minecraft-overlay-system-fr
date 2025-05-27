@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Overlay Control Panel</title>
+  <script type="module" crossorigin src="/assets/index-BOHHnGUJ.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-MqXQ48ai.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <h1>🎮 Minecraft Overlay Control Panel</h1>
+                <div class="connection-status">
+                    <span id="connection-indicator" class="status-indicator offline">●</span>
+                    <span id="connection-text">Disconnected</span>
+                </div>
+            </div>
+        </header>
+
+        <nav class="sidebar">
+            <div class="nav-item active" data-tab="dashboard">
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </div>
+            <div class="nav-item" data-tab="overlay-settings">
+                <span class="nav-icon">🎨</span>
+                Overlay Settings
+            </div>
+            <div class="nav-item" data-tab="data-sources">
+                <span class="nav-icon">📡</span>
+                Data Sources
+            </div>
+            <div class="nav-item" data-tab="placeholders">
+                <span class="nav-icon">🏷️</span>
+                Placeholders
+            </div>
+            <div class="nav-item" data-tab="preview">
+                <span class="nav-icon">👁️</span>
+                Live Preview
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>Server Status</h3>
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <span class="label">Players Online:</span>
+                                <span id="players-online" class="value">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">TPS:</span>
+                                <span id="server-tps" class="value">20.0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Memory Usage:</span>
+                                <span id="memory-usage" class="value">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Client Data</h3>
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <span class="label">Coordinates:</span>
+                                <span id="player-coords" class="value">0, 0, 0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Health:</span>
+                                <span id="player-health" class="value">20.0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Dimension:</span>
+                                <span id="player-dimension" class="value">Overworld</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Data Collection</h3>
+                        <div class="toggle-group">
+                            <label class="toggle">
+                                <input type="checkbox" id="enable-client-data" checked>
+                                <span class="toggle-slider"></span>
+                                Client Data Collection
+                            </label>
+                            <label class="toggle">
+                                <input type="checkbox" id="enable-server-data" checked>
+                                <span class="toggle-slider"></span>
+                                Server Data Collection
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Quick Actions</h3>
+                        <div class="button-group">
+                            <button class="btn btn-primary" id="refresh-data">Refresh Data</button>
+                            <button class="btn btn-secondary" id="export-config">Export Config</button>
+                            <button class="btn btn-secondary" id="import-config">Import Config</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overlay Settings Tab -->
+            <div id="overlay-settings" class="tab-content">
+                <div class="settings-grid">
+                    <div class="card">
+                        <h3>Appearance</h3>
+                        <div class="form-group">
+                            <label for="overlay-theme">Theme:</label>
+                            <select id="overlay-theme">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                                <option value="minecraft">Minecraft</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="primary-color">Primary Color:</label>
+                            <input type="color" id="primary-color" value="#FFCC00">
+                        </div>
+                        <div class="form-group">
+                            <label for="background-opacity">Background Opacity:</label>
+                            <input type="range" id="background-opacity" min="0" max="100" value="70">
+                            <span class="range-value">70%</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Layout</h3>
+                        <div class="form-group">
+                            <label for="overlay-position">Position:</label>
+                            <select id="overlay-position">
+                                <option value="top-left">Top Left</option>
+                                <option value="top-right">Top Right</option>
+                                <option value="bottom-left">Bottom Left</option>
+                                <option value="bottom-right">Bottom Right</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="overlay-scale">Scale:</label>
+                            <input type="range" id="overlay-scale" min="50" max="200" value="100">
+                            <span class="range-value">100%</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Elements</h3>
+                        <div class="element-list">
+                            <div class="element-item">
+                                <label class="toggle">
+                                    <input type="checkbox" id="show-coordinates" checked>
+                                    <span class="toggle-slider"></span>
+                                    Show Coordinates
+                                </label>
+                                <button class="btn btn-small" onclick="configureElement('coordinates')">Configure</button>
+                            </div>
+                            <div class="element-item">
+                                <label class="toggle">
+                                    <input type="checkbox" id="show-health" checked>
+                                    <span class="toggle-slider"></span>
+                                    Show Health
+                                </label>
+                                <button class="btn btn-small" onclick="configureElement('health')">Configure</button>
+                            </div>
+                            <div class="element-item">
+                                <label class="toggle">
+                                    <input type="checkbox" id="show-server-info" checked>
+                                    <span class="toggle-slider"></span>
+                                    Show Server Info
+                                </label>
+                                <button class="btn btn-small" onclick="configureElement('server-info')">Configure</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Sources Tab -->
+            <div id="data-sources" class="tab-content">
+                <div class="data-sources-grid">
+                    <div class="card">
+                        <h3>Client Mod Connection</h3>
+                        <div class="connection-info">
+                            <div class="status-item">
+                                <span class="label">Status:</span>
+                                <span id="client-status" class="value status-offline">Disconnected</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Last Update:</span>
+                                <span id="client-last-update" class="value">Never</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-update-rate">Update Rate (ms):</label>
+                            <input type="number" id="client-update-rate" value="100" min="50" max="5000">
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Server Plugin Connection</h3>
+                        <div class="connection-info">
+                            <div class="status-item">
+                                <span class="label">Status:</span>
+                                <span id="server-status" class="value status-offline">Disconnected</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Last Update:</span>
+                                <span id="server-last-update" class="value">Never</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="server-update-rate">Update Rate (ms):</label>
+                            <input type="number" id="server-update-rate" value="5000" min="1000" max="30000">
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Data Collection Settings</h3>
+                        <div class="checkbox-group">
+                            <label class="checkbox">
+                                <input type="checkbox" id="collect-coordinates" checked>
+                                Player Coordinates
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="collect-health" checked>
+                                Player Health
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="collect-server-stats" checked>
+                                Server Statistics
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="collect-tps" checked>
+                                Server TPS
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="collect-player-list" checked>
+                                Player List
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholders Tab -->
+            <div id="placeholders" class="tab-content">
+                <div class="placeholders-grid">
+                    <div class="card">
+                        <h3>Available Placeholders</h3>
+                        <div class="placeholder-list" id="available-placeholders">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Custom Placeholders</h3>
+                        <div class="form-group">
+                            <label for="new-placeholder">Add Custom Placeholder:</label>
+                            <div class="input-group">
+                                <input type="text" id="new-placeholder" placeholder="%custom_placeholder%">
+                                <button class="btn btn-primary" onclick="addCustomPlaceholder()">Add</button>
+                            </div>
+                        </div>
+                        <div class="custom-placeholder-list" id="custom-placeholders">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Placeholder Preview</h3>
+                        <div class="placeholder-preview" id="placeholder-preview">
+                            <!-- Live preview of placeholder values -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Preview Tab -->
+            <div id="preview" class="tab-content">
+                <div class="preview-container">
+                    <div class="preview-controls">
+                        <button class="btn btn-primary" id="refresh-preview">Refresh Preview</button>
+                        <button class="btn btn-secondary" id="fullscreen-preview">Fullscreen</button>
+                        <label class="toggle">
+                            <input type="checkbox" id="auto-refresh-preview" checked>
+                            <span class="toggle-slider"></span>
+                            Auto Refresh
+                        </label>
+                    </div>
+                    <div class="preview-frame">
+                        <iframe id="overlay-preview" src="about:blank" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="element-config-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Configure Element</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveElementConfig()">Save</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Minecraft Overlay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: transparent;
+            color: white;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .overlay-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .overlay-element {
+            position: absolute;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .coordinates-display {
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #FFFFFF;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .health-display {
+            top: 50px;
+            right: 10px;
+            background: rgba(220, 20, 60, 0.8);
+            color: #FFFFFF;
+            font-size: 16px;
+        }
+
+        .server-info-display {
+            top: 90px;
+            right: 10px;
+            background: rgba(255, 204, 0, 0.8);
+            color: #000000;
+            font-size: 14px;
+        }
+
+        .player-stats-display {
+            top: 130px;
+            right: 10px;
+            background: rgba(0, 123, 255, 0.8);
+            color: #FFFFFF;
+            font-size: 14px;
+        }
+
+        .dimension-display {
+            top: 170px;
+            right: 10px;
+            background: rgba(138, 43, 226, 0.8);
+            color: #FFFFFF;
+            font-size: 14px;
+        }
+
+        .fps-display {
+            top: 210px;
+            right: 10px;
+            background: rgba(34, 139, 34, 0.8);
+            color: #FFFFFF;
+            font-size: 14px;
+        }
+
+        .status-effects-display {
+            top: 250px;
+            right: 10px;
+            background: rgba(255, 165, 0, 0.8);
+            color: #000000;
+            font-size: 12px;
+            max-width: 200px;
+        }
+
+        .placeholder-display {
+            top: 290px;
+            right: 10px;
+            background: rgba(128, 0, 128, 0.8);
+            color: #FFFFFF;
+            font-size: 12px;
+            max-width: 250px;
+        }
+
+        .hidden {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        .visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Theme variations */
+        .theme-dark .overlay-element {
+            background: rgba(0, 0, 0, 0.8);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .theme-light .overlay-element {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #000000;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .theme-minecraft .overlay-element {
+            background: rgba(139, 69, 19, 0.9);
+            border: 2px solid #8B4513;
+            border-radius: 0;
+            font-family: 'Courier New', monospace;
+            color: #FFFFFF;
+            text-shadow: 2px 2px 0px #000000;
+        }
+
+        /* Position variations */
+        .position-top-left .overlay-element {
+            left: 10px;
+            right: auto;
+        }
+
+        .position-bottom-left .overlay-element {
+            left: 10px;
+            right: auto;
+            top: auto;
+            bottom: calc(100vh - var(--element-top) - 40px);
+        }
+
+        .position-bottom-right .overlay-element {
+            top: auto;
+            bottom: calc(100vh - var(--element-top) - 40px);
+        }
+
+        /* Connection status indicator */
+        .connection-status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
+            font-size: 12px;
+            color: #FFFFFF;
+        }
+
+        .connection-status.connected {
+            color: #4CAF50;
+        }
+
+        .connection-status.disconnected {
+            color: #f44336;
+        }
+
+        /* Health bar */
+        .health-bar {
+            width: 100px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        /* Hunger bar */
+        .hunger-bar {
+            width: 100px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            margin-top: 2px;
+            overflow: hidden;
+        }
+
+        .hunger-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8B4513, #DAA520);
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        /* XP bar */
+        .xp-bar {
+            width: 120px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin-top: 2px;
+            overflow: hidden;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #7fff00);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .overlay-element {
+                font-size: 12px !important;
+                padding: 6px 8px;
+            }
+            
+            .coordinates-display {
+                font-size: 14px !important;
+            }
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .overlay-element {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* Privacy mode (hide sensitive data from stream) */
+        .privacy-mode .coordinates-display {
+            display: none;
+        }
+
+        .privacy-mode .player-stats-display .coordinates {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay-container" id="overlayContainer">
+        <!-- Coordinates Display -->
+        <div class="overlay-element coordinates-display" id="coordinatesDisplay">
+            <div class="coordinates-text">X: 0, Y: 0, Z: 0</div>
+        </div>
+
+        <!-- Health Display -->
+        <div class="overlay-element health-display" id="healthDisplay">
+            <div class="health-text">❤️ 20.0/20.0</div>
+            <div class="health-bar">
+                <div class="health-bar-fill" id="healthBarFill" style="width: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- Server Info Display -->
+        <div class="overlay-element server-info-display" id="serverInfoDisplay">
+            <div class="server-text">🌐 Server: Offline</div>
+        </div>
+
+        <!-- Player Stats Display -->
+        <div class="overlay-element player-stats-display" id="playerStatsDisplay">
+            <div class="stats-text">
+                🍖 <span id="hungerLevel">20</span>/20
+                <div class="hunger-bar">
+                    <div class="hunger-bar-fill" id="hungerBarFill" style="width: 100%;"></div>
+                </div>
+                ⭐ Level <span id="playerLevel">0</span>
+                <div class="xp-bar">
+                    <div class="xp-bar-fill" id="xpBarFill" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dimension Display -->
+        <div class="overlay-element dimension-display" id="dimensionDisplay">
+            <div class="dimension-text">🌍 Overworld</div>
+        </div>
+
+        <!-- FPS Display -->
+        <div class="overlay-element fps-display" id="fpsDisplay">
+            <div class="fps-text">📊 FPS: 60 | Ping: 0ms</div>
+        </div>
+
+        <!-- Status Effects Display -->
+        <div class="overlay-element status-effects-display" id="statusEffectsDisplay">
+            <div class="effects-text">✨ No active effects</div>
+        </div>
+
+        <!-- Placeholder Display -->
+        <div class="overlay-element placeholder-display" id="placeholderDisplay">
+            <div class="placeholder-text">🏷️ Placeholders loading...</div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="connection-status disconnected" id="connectionStatus">
+            ● Disconnected
+        </div>
+    </div>
+
+    <script>
+        class EnhancedMinecraftOverlay {
+            constructor() {
+                this.config = {
+                    wsUrl: 'ws://localhost:3002/overlay',
+                    reconnectInterval: 5000,
+                    updateInterval: 100
+                };
+                
+                this.websocket = null;
+                this.isConnected = false;
+                this.overlayConfig = null;
+                this.lastClientData = null;
+                this.lastServerData = null;
+                this.privacyMode = false;
+                
+                this.elements = {
+                    coordinates: document.getElementById('coordinatesDisplay'),
+                    health: document.getElementById('healthDisplay'),
+                    serverInfo: document.getElementById('serverInfoDisplay'),
+                    playerStats: document.getElementById('playerStatsDisplay'),
+                    dimension: document.getElementById('dimensionDisplay'),
+                    fps: document.getElementById('fpsDisplay'),
+                    statusEffects: document.getElementById('statusEffectsDisplay'),
+                    placeholder: document.getElementById('placeholderDisplay'),
+                    connectionStatus: document.getElementById('connectionStatus')
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupWebSocket();
+                this.loadConfiguration();
+                this.startUpdateLoop();
+                
+                // Check for privacy mode (hide coordinates from stream)
+                const urlParams = new URLSearchParams(window.location.search);
+                this.privacyMode = urlParams.get('privacy') === 'true';
+                
+                if (this.privacyMode) {
+                    document.body.classList.add('privacy-mode');
+                }
+            }
+            
+            setupWebSocket() {
+                try {
+                    this.websocket = new WebSocket(this.config.wsUrl);
+                    
+                    this.websocket.onopen = () => {
+                        console.log('Connected to overlay server');
+                        this.isConnected = true;
+                        this.updateConnectionStatus();
+                        
+                        // Request current configuration
+                        this.websocket.send(JSON.stringify({
+                            type: 'config_request'
+                        }));
+                    };
+                    
+                    this.websocket.onmessage = (event) => {
+                        try {
+                            const data = JSON.parse(event.data);
+                            this.handleMessage(data);
+                        } catch (e) {
+                            console.error('Error parsing WebSocket message:', e);
+                        }
+                    };
+                    
+                    this.websocket.onclose = () => {
+                        console.log('Disconnected from overlay server');
+                        this.isConnected = false;
+                        this.updateConnectionStatus();
+                        
+                        // Attempt to reconnect
+                        setTimeout(() => this.setupWebSocket(), this.config.reconnectInterval);
+                    };
+                    
+                    this.websocket.onerror = (error) => {
+                        console.error('WebSocket error:', error);
+                        this.isConnected = false;
+                        this.updateConnectionStatus();
+                    };
+                } catch (e) {
+                    console.error('Failed to create WebSocket connection:', e);
+                    this.isConnected = false;
+                    this.updateConnectionStatus();
+                    
+                    // Retry connection
+                    setTimeout(() => this.setupWebSocket(), this.config.reconnectInterval);
+                }
+            }
+            
+            handleMessage(data) {
+                switch (data.type) {
+                    case 'client_data':
+                        this.lastClientData = data;
+                        this.updateClientDisplay();
+                        break;
+                    case 'server_data':
+                        this.lastServerData = data;
+                        this.updateServerDisplay();
+                        break;
+                    case 'overlay_config':
+                    case 'config_update':
+                        this.overlayConfig = data.config;
+                        this.applyConfiguration();
+                        break;
+                    case 'placeholder_data':
+                        this.updatePlaceholderDisplay(data);
+                        break;
+                }
+            }
+            
+            updateClientDisplay() {
+                if (!this.lastClientData) return;
+                
+                const data = this.lastClientData;
+                
+                // Update coordinates
+                if (data.coordinates && !this.privacyMode) {
+                    const coords = `X: ${Math.round(data.coordinates.x)}, Y: ${Math.round(data.coordinates.y)}, Z: ${Math.round(data.coordinates.z)}`;
+                    this.elements.coordinates.querySelector('.coordinates-text').textContent = coords;
+                    this.showElement('coordinates');
+                } else if (this.privacyMode) {
+                    this.hideElement('coordinates');
+                }
+                
+                // Update health
+                if (data.health) {
+                    const healthText = `❤️ ${data.health.health.toFixed(1)}/${data.health.maxHealth.toFixed(1)}`;
+                    this.elements.health.querySelector('.health-text').textContent = healthText;
+                    
+                    const healthPercent = (data.health.health / data.health.maxHealth) * 100;
+                    document.getElementById('healthBarFill').style.width = `${healthPercent}%`;
+                    this.showElement('health');
+                }
+                
+                // Update hunger and XP
+                if (data.hunger !== undefined) {
+                    document.getElementById('hungerLevel').textContent = data.hunger;
+                    const hungerPercent = (data.hunger / 20) * 100;
+                    document.getElementById('hungerBarFill').style.width = `${hungerPercent}%`;
+                }
+                
+                if (data.level !== undefined) {
+                    document.getElementById('playerLevel').textContent = data.level;
+                }
+                
+                if (data.exp !== undefined) {
+                    const xpPercent = data.exp * 100;
+                    document.getElementById('xpBarFill').style.width = `${xpPercent}%`;
+                }
+                
+                this.showElement('playerStats');
+                
+                // Update dimension
+                if (data.dimension) {
+                    const dimension = data.dimension.replace('minecraft:', '').replace(/_/g, ' ');
+                    const dimensionName = dimension.charAt(0).toUpperCase() + dimension.slice(1);
+                    this.elements.dimension.querySelector('.dimension-text').textContent = `🌍 ${dimensionName}`;
+                    this.showElement('dimension');
+                }
+                
+                // Update FPS and ping
+                if (data.fps !== undefined || data.ping !== undefined) {
+                    const fps = data.fps || 'N/A';
+                    const ping = data.ping || 0;
+                    this.elements.fps.querySelector('.fps-text').textContent = `📊 FPS: ${fps} | Ping: ${ping}ms`;
+                    this.showElement('fps');
+                }
+                
+                // Update status effects
+                if (data.statusEffects && data.statusEffects.length > 0) {
+                    const effectsText = data.statusEffects.map(effect => 
+                        `${effect.name} ${effect.amplifier > 0 ? `(${effect.amplifier + 1})` : ''}`
+                    ).join(', ');
+                    this.elements.statusEffects.querySelector('.effects-text').textContent = `✨ ${effectsText}`;
+                    this.showElement('statusEffects');
+                } else {
+                    this.elements.statusEffects.querySelector('.effects-text').textContent = '✨ No active effects';
+                    this.showElement('statusEffects');
+                }
+            }
+            
+            updateServerDisplay() {
+                if (!this.lastServerData) return;
+                
+                const data = this.lastServerData;
+                
+                // Update server info
+                if (data.serverStats) {
+                    const serverText = `🌐 Players: ${data.serverStats.onlinePlayers}/${data.serverStats.maxPlayers}`;
+                    this.elements.serverInfo.querySelector('.server-text').textContent = serverText;
+                    this.showElement('serverInfo');
+                }
+                
+                // Update TPS in server info if available
+                if (data.tps) {
+                    const currentText = this.elements.serverInfo.querySelector('.server-text').textContent;
+                    const tpsText = ` | TPS: ${data.tps.tps1m.toFixed(1)}`;
+                    this.elements.serverInfo.querySelector('.server-text').textContent = currentText + tpsText;
+                }
+            }
+            
+            updatePlaceholderDisplay(data) {
+                if (data.placeholders && Object.keys(data.placeholders).length > 0) {
+                    const placeholderText = Object.entries(data.placeholders)
+                        .slice(0, 3) // Show only first 3 placeholders
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(' | ');
+                    this.elements.placeholder.querySelector('.placeholder-text').textContent = `🏷️ ${placeholderText}`;
+                    this.showElement('placeholder');
+                } else {
+                    this.hideElement('placeholder');
+                }
+            }
+            
+            applyConfiguration() {
+                if (!this.overlayConfig) return;
+                
+                const container = document.getElementById('overlayContainer');
+                
+                // Apply theme
+                container.className = `overlay-container theme-${this.overlayConfig.theme} position-${this.overlayConfig.position}`;
+                
+                // Apply scale
+                container.style.transform = `scale(${this.overlayConfig.scale / 100})`;
+                container.style.transformOrigin = this.getTransformOrigin();
+                
+                // Apply element visibility and positions
+                Object.entries(this.overlayConfig.elements).forEach(([elementKey, elementConfig]) => {
+                    const element = this.elements[elementKey.replace('-', '')];
+                    if (element) {
+                        if (elementConfig.visible) {
+                            this.showElement(elementKey.replace('-', ''));
+                            
+                            // Apply custom positioning
+                            if (elementConfig.x !== undefined) {
+                                element.style.left = `${elementConfig.x}px`;
+                                element.style.right = 'auto';
+                            }
+                            if (elementConfig.y !== undefined) {
+                                element.style.top = `${elementConfig.y}px`;
+                                element.style.setProperty('--element-top', `${elementConfig.y}px`);
+                            }
+                            
+                            // Apply custom styling
+                            if (elementConfig.fontSize) {
+                                element.style.fontSize = `${elementConfig.fontSize}px`;
+                            }
+                            if (elementConfig.color) {
+                                element.style.color = elementConfig.color;
+                            }
+                        } else {
+                            this.hideElement(elementKey.replace('-', ''));
+                        }
+                    }
+                });
+                
+                // Apply primary color
+                if (this.overlayConfig.primaryColor) {
+                    document.documentElement.style.setProperty('--primary-color', this.overlayConfig.primaryColor);
+                }
+                
+                // Apply background opacity
+                if (this.overlayConfig.backgroundOpacity !== undefined) {
+                    const opacity = this.overlayConfig.backgroundOpacity / 100;
+                    document.querySelectorAll('.overlay-element').forEach(element => {
+                        const currentBg = getComputedStyle(element).backgroundColor;
+                        if (currentBg.includes('rgba')) {
+                            const rgbaMatch = currentBg.match(/rgba?\(([^)]+)\)/);
+                            if (rgbaMatch) {
+                                const values = rgbaMatch[1].split(',').map(v => v.trim());
+                                element.style.backgroundColor = `rgba(${values[0]}, ${values[1]}, ${values[2]}, ${opacity})`;
+                            }
+                        }
+                    });
+                }
+            }
+            
+            getTransformOrigin() {
+                if (!this.overlayConfig) return 'top right';
+                
+                switch (this.overlayConfig.position) {
+                    case 'top-left': return 'top left';
+                    case 'top-right': return 'top right';
+                    case 'bottom-left': return 'bottom left';
+                    case 'bottom-right': return 'bottom right';
+                    default: return 'top right';
+                }
+            }
+            
+            showElement(elementKey) {
+                const element = this.elements[elementKey];
+                if (element) {
+                    element.classList.remove('hidden');
+                    element.classList.add('visible');
+                }
+            }
+            
+            hideElement(elementKey) {
+                const element = this.elements[elementKey];
+                if (element) {
+                    element.classList.remove('visible');
+                    element.classList.add('hidden');
+                }
+            }
+            
+            updateConnectionStatus() {
+                const status = this.elements.connectionStatus;
+                if (this.isConnected) {
+                    status.textContent = '● Connected';
+                    status.className = 'connection-status connected';
+                } else {
+                    status.textContent = '● Disconnected';
+                    status.className = 'connection-status disconnected';
+                }
+            }
+            
+            loadConfiguration() {
+                // Try to load configuration from localStorage as fallback
+                try {
+                    const savedConfig = localStorage.getItem('overlayConfig');
+                    if (savedConfig) {
+                        this.overlayConfig = JSON.parse(savedConfig);
+                        this.applyConfiguration();
+                    }
+                } catch (e) {
+                    console.error('Error loading saved configuration:', e);
+                }
+            }
+            
+            startUpdateLoop() {
+                setInterval(() => {
+                    // Periodic updates if needed
+                    if (this.isConnected && this.websocket.readyState === WebSocket.OPEN) {
+                        // Send ping to keep connection alive
+                        this.websocket.send(JSON.stringify({ type: 'ping' }));
+                    }
+                }, 30000); // Every 30 seconds
+            }
+        }
+        
+        // Initialize the overlay when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.minecraftOverlay = new EnhancedMinecraftOverlay();
+        });
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('Overlay hidden');
+            } else {
+                console.log('Overlay visible');
+                // Refresh data when overlay becomes visible
+                if (window.minecraftOverlay && window.minecraftOverlay.websocket) {
+                    window.minecraftOverlay.websocket.send(JSON.stringify({ type: 'refresh_request' }));
+                }
+            }
+        });
+    </script>
+</body>
+</html>

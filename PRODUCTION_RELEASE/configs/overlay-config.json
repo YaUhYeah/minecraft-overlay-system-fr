@@ -1,0 +1,33 @@
+{
+  "server": {
+    "port": 3002,
+    "host": "localhost",
+    "cors": true
+  },
+  "websocket": {
+    "enabled": true,
+    "heartbeat": 30000
+  },
+  "twitch": {
+    "enabled": true,
+    "channel": "your-twitch-channel",
+    "clientId": "your-client-id",
+    "clientSecret": "your-client-secret"
+  },
+  "minecraft": {
+    "server": "your-server.com:25565",
+    "enablePing": true,
+    "pingInterval": 30000
+  },
+  "display": {
+    "theme": "dark",
+    "animations": true,
+    "transparency": 0.9,
+    "position": "top-right"
+  },
+  "data": {
+    "retentionPeriod": 3600000,
+    "maxCacheSize": 1000,
+    "enableCompression": true
+  }
+}

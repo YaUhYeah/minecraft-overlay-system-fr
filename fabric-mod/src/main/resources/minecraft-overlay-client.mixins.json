@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.yauhyeah.overlaymod.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "minecraft-overlay-client.refmap.json",
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

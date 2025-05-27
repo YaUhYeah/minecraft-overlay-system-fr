@@ -1,0 +1,27 @@
+{
+  "overlay": {
+    "serverUrl": "http://localhost:3002/api/client-data",
+    "updateInterval": 1000,
+    "enabled": true,
+    "debug": false
+  },
+  "data": {
+    "coordinates": true,
+    "health": true,
+    "hunger": true,
+    "experience": true,
+    "fps": true,
+    "dimension": true,
+    "biome": true
+  },
+  "privacy": {
+    "hideCoordinates": false,
+    "hideHealth": false,
+    "streamSafeMode": true
+  },
+  "performance": {
+    "maxUpdateRate": 60,
+    "enableBatching": true,
+    "compressionLevel": 1
+  }
+}
